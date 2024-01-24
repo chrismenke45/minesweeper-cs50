@@ -210,16 +210,21 @@ class MinesweeperAI():
         new_knowledge = []
         for sentence in self.knowledge:
             sentence_length = len(sentence.cells)
-            if sentence_length < new_sentence_length:
-                if sentence.cells.issubset(new_sentence.cells):
-                    #TODO fix that this is being added to the list that is already being iterated over
-                    #TODO check if there already exists a sentance like this before adding it
-                    new_knowledge.append(Sentence(new_sentence.cells - sentence.cells, new_sentence.count - sentence.count))
-            elif sentence_length > new_sentence_length:
-                if new_sentence.cells.issubset(sentence.cells):
-                    #TODO fix that this is being added to the list that is already being iterated over
-                    #TODO check if there already exists a sentance like this before adding it
-                    new_knowledge.append(Sentence(sentence.cells - new_sentence.cells, sentence.count - new_sentence.count))
+            if sentence_length and new_sentence_length:
+                if sentence_length < new_sentence_length:
+                    if sentence.cells.issubset(new_sentence.cells):
+                        #TODO check if there already exists a sentance like this before adding it
+                        extrapolated_cells = new_sentence.cells - sentence.cells
+                        extrapolated_count = new_sentence.count - sentence.count
+                        if not ( any(sentence.cells ==  extrapolated_cells for sentence in self.knowledge) or any(sentence.cells ==  extrapolated_cells for sentence in new_knowledge) ):
+                            new_knowledge.append(Sentence(extrapolated_cells, extrapolated_count))
+                elif sentence_length > new_sentence_length:
+                    if new_sentence.cells.issubset(sentence.cells):
+                        #TODO check if there already exists a sentance like this before adding it
+                        extrapolated_cells = sentence.cells - new_sentence.cells
+                        extrapolated_count = sentence.count - new_sentence.count
+                        if not ( any(sentence.cells ==  extrapolated_cells for sentence in self.knowledge) or any(sentence.cells ==  extrapolated_cells for sentence in new_knowledge) ):
+                            new_knowledge.append(Sentence(extrapolated_cells, extrapolated_count))
         
         self.knowledge.extend(new_knowledge)
         self.add_safe_to_sentences(cell)
@@ -257,7 +262,7 @@ class MinesweeperAI():
             for j in range(cell[1] - 1, cell[1] + 2):
                 if i == cell[0] and j == cell[1]:
                     continue
-                if i >= 0 and i <= self.height and j >= 0 and j <= self.width:
+                if i >= 0 and i < self.height and j >= 0 and j < self.width:
                     cells.add((i,j))
         return cells
 

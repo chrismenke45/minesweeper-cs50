@@ -263,32 +263,43 @@ class MinesweeperAI():
 
     def add_safe_to_sentences(self, safe_cell):
         self.mark_safe(safe_cell)
-        #new_safes_to_add = []
+        new_safes_to_add = []
+        new_mines_to_add = []
         for sentence in self.knowledge:
             if len(sentence.known_safes()):
                 for new_safe_cell in sentence.known_safes():
                     if new_safe_cell in self.safes:
                         continue
-                    self.add_safe_to_sentences(new_safe_cell)
+                    new_safes_to_add.append(new_safe_cell)
             if len(sentence.known_mines()):
                 for new_mine_cell in sentence.known_mines():
                     if new_mine_cell in self.mines:
                         continue
-                    self.add_mine_to_sentences(new_mine_cell)
+                    new_mines_to_add.append(new_mine_cell)
+        for new_safe in new_safes_to_add:
+            self.add_safe_to_sentences(new_safe)
+        for new_mine in new_mines_to_add:
+            self.add_mine_to_sentences(new_mine)
     
     def add_mine_to_sentences(self, mine_cell):
         self.mark_mine(mine_cell)
+        new_safes_to_add = []
+        new_mines_to_add = []
         for sentence in self.knowledge:
             if len(sentence.known_mines()):
                 for new_mine_cell in sentence.known_mines():
                     if new_mine_cell in self.mines:
                         continue
-                    self.add_mine_to_sentences(new_mine_cell)
+                    new_mines_to_add.append(new_mine_cell)
             if len(sentence.known_safes()):
                 for new_safe_cell in sentence.known_safes():
                     if new_safe_cell in self.safes:
                         continue
-                    self.add_safe_to_sentences(new_safe_cell)
+                    new_safes_to_add.append(new_safe_cell)
+        for new_mine in new_mines_to_add:
+            self.add_mine_to_sentences(new_mine)
+        for new_safe in new_safes_to_add:
+            self.add_safe_to_sentences(new_safe)
 
     
 
